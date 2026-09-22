@@ -1,8 +1,6 @@
 import allure
 import pytest
-import requests
 
-import data
 import helpers
 
 
@@ -16,13 +14,9 @@ class TestLoginCourier:
     @allure.title('Нельзя авторизоваться без обязательного поля')
     @pytest.mark.parametrize('field', ['login', 'password'])
     def test_login_courier_without_required_field(self, courier, field):
-        payload = {'login': courier['login'], 'password': courier['password']}
-        payload[field] = ''
-        response = requests.post(
-            data.BASE_URL + data.LOGIN_COURIER,
-            json=payload,
-            timeout=helpers.TIMEOUT,
-        )
+        login = '' if field == 'login' else courier['login']
+        password = '' if field == 'password' else courier['password']
+        response = helpers.login_courier(login, password)
         assert response.status_code == 400
         assert response.json()['message'] == 'Недостаточно данных для входа'
 
